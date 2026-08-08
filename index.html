@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wiki StickBotnext — StickBot & StickNext</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="txt.css">
+</head>
+<body>
+
+<div class="app" id="app"></div>
+
+<!-- Musik engine root: markup minimal untuk music-engine.js (tidak terlihat kecuali halaman musik aktif) -->
+<div id="aura-music-root" style="display:block;">
+	<div id="aura-loader-overlay" class="aura-loader-overlay">Memuat musik...</div>
+	<div id="library-view" class="view-container glass-panel music-library">
+		<div id="slot-grid"></div>
+		<div class="library-controls">
+			<input id="file-input" type="file" multiple accept="audio/*">
+			<input id="search-input" placeholder="Cari musik...">
+			<select id="sort-select"><option value="default">Default</option><option value="title">Judul</option><option value="artist">Artis</option></select>
+		</div>
+		<div id="song-list" class="song-list"></div>
+		<div id="playlist-grid" class="playlist-grid"></div>
+		<button id="btn-create-playlist" class="btn">Buat Playlist</button>
+	</div>
+
+	<div id="player-view" class="view-container glass-panel music-player">
+		<button id="btn-back" class="btn">Kembali</button>
+		<div class="player-top">
+			<img id="player-cover" src="" alt="cover">
+			<div class="player-meta">
+				<div id="player-title"></div>
+				<div id="player-artist"></div>
+			</div>
+		</div>
+		<audio id="audio-core" preload="metadata"></audio>
+		<div class="player-controls">
+			<button id="btn-prev" class="btn">Prev</button>
+			<button id="btn-play" class="btn"><i id="play-icon" class="fas fa-play"></i></button>
+			<button id="btn-next" class="btn">Next</button>
+			<button id="btn-shuffle" class="btn">Shuffle</button>
+			<button id="btn-repeat" class="btn">Repeat</button>
+		</div>
+		<input id="seek-bar" type="range" min="0" value="0">
+		<div class="time-row"><span id="time-current">0:00</span><span id="time-total">0:00</span></div>
+		<select id="player-cover-fx-select"></select>
+		<canvas id="visualizer-canvas" style="width:100%;height:80px;display:block"></canvas>
+		<canvas id="waveform-canvas" style="width:100%;height:60px;display:block"></canvas>
+		<div id="up-next-list"></div>
+		<div id="crazy-features"></div>
+		<div id="custom-preset-list"></div>
+		<input id="preset-name-input" placeholder="Nama preset">
+		<button id="btn-save-preset">Simpan Preset</button>
+
+		<div id="playlist-view" class="view-container glass-panel playlist-view">
+			<div id="playlist-detail-name"></div>
+			<div id="playlist-song-list"></div>
+			<button id="btn-back-playlist">Kembali</button>
+			<button id="btn-playlist-playall">Putar Semua</button>
+			<button id="btn-playlist-addsongs">Tambah Lagu</button>
+			<button id="btn-playlist-rename">Ubah Nama</button>
+			<button id="btn-playlist-delete">Hapus Playlist</button>
+		</div>
+	</div>
+
+	<div id="mini-player" class="mini-player">
+		<img id="mini-cover" src="" alt="cover">
+		<div id="mini-title"></div>
+		<div id="mini-artist"></div>
+		<button id="mini-play-btn"><i id="mini-play-icon" class="fas fa-play"></i></button>
+	</div>
+</div>
+
+<script src="music-engine.js"></script>
+
+<!-- Urutan penting: data lebih dulu, lalu modul halaman khusus, lalu logika aplikasi -->
+<script src="data.js"></script>
+<script src="music.js"></script>
+<script src="creator-bio-page.js"></script>
+<script src="music-index-page.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
