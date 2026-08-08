@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; overflow: hidden; }
+html, body { min-height: 100%; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; overflow: auto; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+button, input, select, textarea { touch-action: manipulation; }
 
 .aura-loader-overlay {
   position: fixed; inset: 0; z-index: 9999;
@@ -72,10 +74,11 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color:
    dengan transition-delay (baru benar-benar dilepas dari render setelah
    animasi keluar selesai) + z-index dasar yang selalu ada di semua state. */
 .view-container {
-  position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+  position: absolute; top: 0; left: 0; width: 100vw; min-height: 100vh; height: auto;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s,
               visibility 0s linear 0.5s;
-  overflow-y: auto; display: flex; justify-content: center; align-items: flex-start; padding: 30px 20px;
+  overflow-y: auto; display: flex; justify-content: center; align-items: flex-start;
+  padding: calc(20px + env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));
   visibility: hidden;
   z-index: 1;
 }

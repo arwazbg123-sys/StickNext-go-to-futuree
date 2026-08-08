@@ -25,6 +25,13 @@ let lightboxSrc = null;
 // pageView: 'article' | 'creator' | 'musicIndex' | 'music'
 let pageView = 'article';
 let activeMusicFor = null;
+let isSidebarOpen = false;
+let isToolsOpen = false;
+let themeMode = window.localStorage.getItem('wikiThemeMode') || 'dark';
+let textSize = window.localStorage.getItem('wikiTextSize') || 'medium';
+let readingMode = window.localStorage.getItem('wikiReadingMode') === 'true';
+let hamburgerNavStyle = window.localStorage.getItem('wikiHamburgerNavStyle') || 'normal';
+let hamburgerToolStyle = window.localStorage.getItem('wikiHamburgerToolStyle') || 'normal';
 
 function cryptoId(){ return 'a' + Math.random().toString(36).slice(2,10); }
 
@@ -83,7 +90,127 @@ function filteredArticles(){
 }
 
 // ---------------- RENDER ----------------
+function applyTheme(){
+  document.body.classList.remove('theme-light','theme-custom');
+  if(themeMode === 'light') document.body.classList.add('theme-light');
+  if(themeMode === 'custom') document.body.classList.add('theme-custom');
+}
+
+function applyViewSettings(){
+  document.body.classList.remove('text-size-small','text-size-medium','text-size-large','reading-mode');
+  document.body.classList.add(`text-size-${textSize}`);
+  if(readingMode) document.body.classList.add('reading-mode');
+}
+
+function applyHamburgerVisuals(){
+  const navBtn = document.getElementById('hamburgerNavBtn');
+  const toolBtn = document.getElementById('hamburgerToolBtn');
+  if(navBtn){
+    navBtn.classList.toggle('hamburger-hidden', hamburgerNavStyle === 'hidden');
+    navBtn.classList.toggle('hamburger-blur', hamburgerNavStyle === 'blur');
+    navBtn.classList.toggle('hamburger-normal', hamburgerNavStyle === 'normal');
+  }
+  if(toolBtn){
+    toolBtn.classList.toggle('hamburger-hidden', hamburgerToolStyle === 'hidden');
+    toolBtn.classList.toggle('hamburger-blur', hamburgerToolStyle === 'blur');
+    toolBtn.classList.toggle('hamburger-normal', hamburgerToolStyle === 'normal');
+  }
+}
+
+function setTheme(mode){
+  themeMode = mode;
+  window.localStorage.setItem('wikiThemeMode', mode);
+  applyTheme();
+  render();
+}
+
+function setTextSize(size){
+  textSize = size;
+  window.localStorage.setItem('wikiTextSize', size);
+  render();
+}
+
+function setHamburgerNavStyle(style){
+  hamburgerNavStyle = style;
+  window.localStorage.setItem('wikiHamburgerNavStyle', style);
+  render();
+}
+
+function setHamburgerToolStyle(style){
+  hamburgerToolStyle = style;
+  window.localStorage.setItem('wikiHamburgerToolStyle', style);
+  render();
+}
+
+function toggleReadingMode(){
+  readingMode = !readingMode;
+  window.localStorage.setItem('wikiReadingMode', readingMode);
+  render();
+}
+
+function resetViewDefaults(){
+  textSize = 'medium';
+  readingMode = false;
+  window.localStorage.setItem('wikiTextSize', textSize);
+  window.localStorage.setItem('wikiReadingMode', 'false');
+  render();
+}
+
+function renderToolDrawer(){
+  return `
+    <div class="tool-drawer${isToolsOpen ? ' visible' : ''}" id="toolDrawer">
+      <h3>Menu Fitur</h3>
+      <p>Pilih mode tampilan dan nyaman baca di semua perangkat.</p>
+      <div class="tool-section">
+        <div class="tool-label">Mode Tema</div>
+        <div class="tool-buttons">
+          <button class="tool-button${themeMode === 'dark' ? ' active' : ''}" data-theme="dark">Mode Gelap</button>
+          <button class="tool-button${themeMode === 'light' ? ' active' : ''}" data-theme="light">Mode Terang</button>
+          <button class="tool-button${themeMode === 'custom' ? ' active' : ''}" data-theme="custom">Mode Kostum</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-label">Ukuran Teks</div>
+        <div class="tool-buttons">
+          <button class="tool-button text-size-button${textSize === 'small' ? ' active' : ''}" data-size="small">Kecil</button>
+          <button class="tool-button text-size-button${textSize === 'medium' ? ' active' : ''}" data-size="medium">Sedang</button>
+          <button class="tool-button text-size-button${textSize === 'large' ? ' active' : ''}" data-size="large">Besar</button>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-label">Tampilan Hamburger</div>
+        <div class="tool-subsection">
+          <div class="tool-sublabel">Navigasi</div>
+          <div class="tool-buttons">
+            <button class="tool-button hamburger-style-button${hamburgerNavStyle === 'normal' ? ' active' : ''}" data-target="nav" data-style="normal">Normal</button>
+            <button class="tool-button hamburger-style-button${hamburgerNavStyle === 'blur' ? ' active' : ''}" data-target="nav" data-style="blur">Blur</button>
+            <button class="tool-button hamburger-style-button${hamburgerNavStyle === 'hidden' ? ' active' : ''}" data-target="nav" data-style="hidden">Sembunyi</button>
+          </div>
+        </div>
+        <div class="tool-subsection">
+          <div class="tool-sublabel">Tema</div>
+          <div class="tool-buttons">
+            <button class="tool-button hamburger-style-button${hamburgerToolStyle === 'normal' ? ' active' : ''}" data-target="tool" data-style="normal">Normal</button>
+            <button class="tool-button hamburger-style-button${hamburgerToolStyle === 'blur' ? ' active' : ''}" data-target="tool" data-style="blur">Blur</button>
+            <button class="tool-button hamburger-style-button${hamburgerToolStyle === 'hidden' ? ' active' : ''}" data-target="tool" data-style="hidden">Sembunyi</button>
+          </div>
+        </div>
+      </div>
+      <div class="tool-section">
+        <div class="tool-label">Mode Baca</div>
+        <button class="tool-button${readingMode ? ' active' : ''}" id="toggleReadingModeBtn">${readingMode ? 'Matikan Mode Baca' : 'Aktifkan Mode Baca'}</button>
+      </div>
+      <div class="tool-section">
+        <button class="tool-button" id="resetViewBtn">Kembalikan Default Tampilan</button>
+      </div>
+    </div>
+    <div class="tool-drawer-overlay${isToolsOpen ? ' visible' : ''}" id="toolDrawerOverlay"></div>
+  `;
+}
+
 function render(){
+  applyTheme();
+  applyViewSettings();
   // preserve sidebar scroll position so clicked card doesn't "jump" after re-render
   const prevCatScroll = (function(){
     try{ const el = document.querySelector('.cat-scroll'); return el ? el.scrollTop : 0; }catch(e){ return 0; }
@@ -91,10 +218,16 @@ function render(){
 
   const app = document.getElementById('app');
   app.innerHTML = `
+    <button class="hamburger-btn nav-hamburger" id="hamburgerNavBtn" aria-label="Buka navigasi"><span></span></button>
+    <button class="hamburger-btn tool-hamburger" id="hamburgerToolBtn" aria-label="Buka fitur"><span></span></button>
+    ${renderToolDrawer()}
+    <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
     ${renderSidebar()}
     ${renderMain()}
     ${lightboxSrc ? renderLightbox() : ""}
   `;
+
+  applyHamburgerVisuals();
 
   // restore previous sidebar scroll (if present)
   try{
@@ -143,7 +276,7 @@ function renderSidebar(){
   });
 
   return `
-  <div class="sidebar">
+  <div class="sidebar${isSidebarOpen ? ' open' : ''}">
     <div class="brand">
       <div class="brand-eyebrow">Production Bible</div>
       <div class="brand-title">Wiki StickBotnext</div>
@@ -446,7 +579,111 @@ function attachEvents(){
   });
 
   const pageBack = document.getElementById('pageBackBtn');
-  if(pageBack) pageBack.addEventListener('click', ()=>{ pageView = 'article'; activeMusicFor = null; render(); });
+  if(pageBack) pageBack.addEventListener('click', ()=>{ pageView = 'article'; activeMusicFor = null; isSidebarOpen = false; render(); });
+
+  const hamburgerNavBtn = document.getElementById('hamburgerNavBtn');
+  const hamburgerToolBtn = document.getElementById('hamburgerToolBtn');
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarOverlay = document.getElementById('mobileSidebarOverlay');
+  const toolDrawer = document.getElementById('toolDrawer');
+  const toolDrawerOverlay = document.getElementById('toolDrawerOverlay');
+  if(hamburgerNavBtn){
+    hamburgerNavBtn.addEventListener('click', ()=>{
+      isSidebarOpen = !isSidebarOpen;
+      if(isSidebarOpen){
+        isToolsOpen = false;
+      }
+      if(sidebar) sidebar.classList.toggle('open', isSidebarOpen);
+      if(sidebarOverlay) sidebarOverlay.classList.toggle('visible', isSidebarOpen);
+      if(toolDrawer) toolDrawer.classList.toggle('visible', isToolsOpen);
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.toggle('visible', isToolsOpen);
+    });
+  }
+  if(hamburgerToolBtn){
+    hamburgerToolBtn.addEventListener('click', ()=>{
+      isToolsOpen = !isToolsOpen;
+      if(isToolsOpen){
+        isSidebarOpen = false;
+      }
+      if(toolDrawer) toolDrawer.classList.toggle('visible', isToolsOpen);
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.toggle('visible', isToolsOpen);
+      if(sidebar) sidebar.classList.toggle('open', isSidebarOpen);
+      if(sidebarOverlay) sidebarOverlay.classList.toggle('visible', isSidebarOpen);
+    });
+  }
+  if(toolDrawerOverlay){
+    toolDrawerOverlay.addEventListener('click', ()=>{
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      toolDrawerOverlay.classList.remove('visible');
+    });
+  }
+  if(sidebarOverlay){
+    sidebarOverlay.addEventListener('click', ()=>{
+      isSidebarOpen = false;
+      if(sidebar) sidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('visible');
+    });
+  }
+  document.querySelectorAll('.tool-button[data-theme]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const mode = btn.dataset.theme;
+      if(mode) setTheme(mode);
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+    });
+  });
+
+  document.querySelectorAll('.text-size-button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const size = btn.dataset.size;
+      if(size) setTextSize(size);
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+    });
+  });
+
+  const readingModeBtn = document.getElementById('toggleReadingModeBtn');
+  if(readingModeBtn){
+    readingModeBtn.addEventListener('click', ()=>{
+      toggleReadingMode();
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+    });
+  }
+
+  const resetViewBtn = document.getElementById('resetViewBtn');
+  if(resetViewBtn){
+    resetViewBtn.addEventListener('click', ()=>{
+      resetViewDefaults();
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+    });
+  }
+
+  document.querySelectorAll('.hamburger-style-button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const target = btn.dataset.target;
+      const style = btn.dataset.style;
+      if(target === 'nav') setHamburgerNavStyle(style);
+      if(target === 'tool') setHamburgerToolStyle(style);
+      isToolsOpen = false;
+      if(toolDrawer) toolDrawer.classList.remove('visible');
+      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+    });
+  });
+
+  document.querySelectorAll('.universe-tab, .folder-tab, .article-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      isSidebarOpen = false;
+      if(sidebar) sidebar.classList.remove('open');
+      if(sidebarOverlay) sidebarOverlay.classList.remove('visible');
+    });
+  });
 
   // Show/hide the full music engine UI which lives outside #app
   try{
