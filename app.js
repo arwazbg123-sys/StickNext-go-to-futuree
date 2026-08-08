@@ -583,9 +583,7 @@ function attachEvents(){
 
   const hamburgerNavBtn = document.getElementById('hamburgerNavBtn');
   const hamburgerToolBtn = document.getElementById('hamburgerToolBtn');
-  const sidebar = document.querySelector('.sidebar');
   const sidebarOverlay = document.getElementById('mobileSidebarOverlay');
-  const toolDrawer = document.getElementById('toolDrawer');
   const toolDrawerOverlay = document.getElementById('toolDrawerOverlay');
   if(hamburgerNavBtn){
     hamburgerNavBtn.addEventListener('click', ()=>{
@@ -593,10 +591,7 @@ function attachEvents(){
       if(isSidebarOpen){
         isToolsOpen = false;
       }
-      if(sidebar) sidebar.classList.toggle('open', isSidebarOpen);
-      if(sidebarOverlay) sidebarOverlay.classList.toggle('visible', isSidebarOpen);
-      if(toolDrawer) toolDrawer.classList.toggle('visible', isToolsOpen);
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.toggle('visible', isToolsOpen);
+      render();
     });
   }
   if(hamburgerToolBtn){
@@ -605,63 +600,54 @@ function attachEvents(){
       if(isToolsOpen){
         isSidebarOpen = false;
       }
-      if(toolDrawer) toolDrawer.classList.toggle('visible', isToolsOpen);
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.toggle('visible', isToolsOpen);
-      if(sidebar) sidebar.classList.toggle('open', isSidebarOpen);
-      if(sidebarOverlay) sidebarOverlay.classList.toggle('visible', isSidebarOpen);
+      render();
     });
   }
   if(toolDrawerOverlay){
     toolDrawerOverlay.addEventListener('click', ()=>{
       isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      toolDrawerOverlay.classList.remove('visible');
+      render();
     });
   }
   if(sidebarOverlay){
     sidebarOverlay.addEventListener('click', ()=>{
       isSidebarOpen = false;
-      if(sidebar) sidebar.classList.remove('open');
-      sidebarOverlay.classList.remove('visible');
+      render();
     });
   }
   document.querySelectorAll('.tool-button[data-theme]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const mode = btn.dataset.theme;
-      if(mode) setTheme(mode);
-      isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+      if(mode){
+        isToolsOpen = false;
+        setTheme(mode);
+      }
     });
   });
 
   document.querySelectorAll('.text-size-button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const size = btn.dataset.size;
-      if(size) setTextSize(size);
-      isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+      if(size){
+        isToolsOpen = false;
+        setTextSize(size);
+      }
     });
   });
 
   const readingModeBtn = document.getElementById('toggleReadingModeBtn');
   if(readingModeBtn){
     readingModeBtn.addEventListener('click', ()=>{
-      toggleReadingMode();
       isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+      toggleReadingMode();
     });
   }
 
   const resetViewBtn = document.getElementById('resetViewBtn');
   if(resetViewBtn){
     resetViewBtn.addEventListener('click', ()=>{
-      resetViewDefaults();
       isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+      resetViewDefaults();
     });
   }
 
@@ -669,11 +655,14 @@ function attachEvents(){
     btn.addEventListener('click', ()=>{
       const target = btn.dataset.target;
       const style = btn.dataset.style;
-      if(target === 'nav') setHamburgerNavStyle(style);
-      if(target === 'tool') setHamburgerToolStyle(style);
-      isToolsOpen = false;
-      if(toolDrawer) toolDrawer.classList.remove('visible');
-      if(toolDrawerOverlay) toolDrawerOverlay.classList.remove('visible');
+      if(target === 'nav'){
+        isToolsOpen = false;
+        setHamburgerNavStyle(style);
+      }
+      if(target === 'tool'){
+        isToolsOpen = false;
+        setHamburgerToolStyle(style);
+      }
     });
   });
 
